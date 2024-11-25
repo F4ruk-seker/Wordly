@@ -50,7 +50,6 @@ pyload : list[dict] = [
     {"word": "sad", "answer": "mutsuz"}
 ]
 
-
 for _ in pyload:
     _["fail"] = 0
 
