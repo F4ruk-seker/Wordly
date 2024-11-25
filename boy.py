@@ -116,98 +116,116 @@ def shake_screen(message: str = 'MAL'):
             pygame.time.delay(50)
     is_shaking = False  # Sallanma işlemi bittiğinde tıklamaları tekrar aktif et
 
+try:
 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.K_ESCAPE:
-            running = False
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+                    running = False
 
-        if event.type == pygame.QUIT:
-            running = False
+            if event.type == pygame.QUIT:
+                running = False
 
-        # Tıklamayı kontrol et (sallanma sırasında engelle)
-        if event.type == pygame.MOUSEBUTTONDOWN and not is_shaking:
-            mouse_pos = pygame.mouse.get_pos()
-            for i, button_rect in enumerate(buttons):
-                if button_rect.collidepoint(mouse_pos):
-                    if i == correct_index:
-                        print("Doğru!")
-                        score += 10
-                        combo += 1
-                        match combo:
-                            case 1:
-                                sounds[1].play()  # v1.mp3 sesini çal
-                            case 2:
-                                sounds[2].play()  # v2.mp3 sesini çal
-                            case 3:
-                                sounds[3].play()  # v3.mp3 sesini çal
-                            case 4:
-                                sounds[4].play()  # v4.mp3 sesini çal
-                            case 5:
-                                sounds[5].play()  # v5.mp3 sesini çal
-                                combo = 0  # Combo'yu sıfırla
-                                if not hp >= 100:
-                                    hp += 5
-                                shake_screen(f'HELALLLLS!!!')  # Sallama efekti
-                    else:
-                        print("Yanlış!")
-                        hp -= 90
-                        sounds[-1].play()  # v5.mp3 sesini çal
-                        shake_screen(f'{options[correct_index]}')  # Sallama efekti
+            # Tıklamayı kontrol et (sallanma sırasında engelle)
+            if event.type == pygame.MOUSEBUTTONDOWN and not is_shaking:
+                mouse_pos = pygame.mouse.get_pos()
+                for i, button_rect in enumerate(buttons):
+                    if button_rect.collidepoint(mouse_pos):
+                        if i == correct_index:
+                            # print("Doğru!")
+                            score += 10
+                            combo += 1
+                            match combo:
+                                case 1:
+                                    sounds[1].play()  # v1.mp3 sesini çal
+                                case 2:
+                                    sounds[2].play()  # v2.mp3 sesini çal
+                                case 3:
+                                    sounds[3].play()  # v3.mp3 sesini çal
+                                case 4:
+                                    sounds[4].play()  # v4.mp3 sesini çal
+                                case 5:
+                                    sounds[5].play()  # v5.mp3 sesini çal
+                                    combo = 0  # Combo'yu sıfırla
+                                    if not hp >= 100:
+                                        hp += 5
+                                    shake_screen(f'HELALLLLS!!!')  # Sallama efekti
+                        else:
+                            # print("Yanlış!")
+                            hp -= 10
+                            sounds[-1].play()  # v5.mp3 sesini çal
+                            shake_screen(f'{options[correct_index]}')  # Sallama efekti
 
-                    # Yeni soru oluştur
-                    selected_word, options, correct_index = generate_question()
+                        # Yeni soru oluştur
+                        selected_word, options, correct_index = generate_question()
 
-    # Arka planı çiz
-    screen.blit(background_image, (0, 0))
-
-    # HP barını çiz
-    pygame.draw.rect(screen, GRAY, (20, 20, 200, 25))
-    pygame.draw.rect(screen, GREEN, (20, 20, hp * 2, 25))  # HP'yi yüzdeye göre ayarlayın
-    hp_label = font.render(f"HP: {hp}", True, WHITE)
-    screen.blit(hp_label, (20, 50))
-
-    # Skor göstergesini çiz
-    score_label = font.render(f"Score: {score}", True, WHITE)
-    screen.blit(score_label, (WIDTH - 150, 20))
-
-    # Ortadaki kelimeyi çiz
-    word_label = large_font.render(selected_word['word'], True, WHITE)
-    word_rect = word_label.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
-    screen.blit(word_label, word_rect)
-
-    # Şıkları çiz
-    buttons = []
-    for i, option in enumerate(options):
-        button_x = start_x + i * (button_width + button_spacing)
-        buttons.append(pygame.Rect(button_x, button_y, button_width, button_height))
-        draw_button(option, button_x, button_y, button_width, button_height, GRAY, BLACK)
-
-    # Oyunu sonlandırma koşulu
-    if hp <= 0:
-        print("Oyun bitti!")
-
-        sounds[-2].set_volume(0.1)
-        sounds[-2].play()
-
+        # Arka planı çiz
         screen.blit(background_image, (0, 0))
-        in_game_time = round((time.perf_counter() - start_time), 2)
-        word_label = large_font.render('OYUN BITTI', True, WHITE)
+
+        # HP barını çiz
+        pygame.draw.rect(screen, GRAY, (20, 20, 200, 25))
+        pygame.draw.rect(screen, GREEN, (20, 20, hp * 2, 25))  # HP'yi yüzdeye göre ayarlayın
+        hp_label = font.render(f"HP: {hp}", True, WHITE)
+        screen.blit(hp_label, (20, 50))
+
+        # Skor göstergesini çiz
+        score_label = font.render(f"Score: {score}", True, WHITE)
+        screen.blit(score_label, (WIDTH - 150, 20))
+
+        # Ortadaki kelimeyi çiz
+        word_label = large_font.render(selected_word['word'], True, WHITE)
         word_rect = word_label.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
         screen.blit(word_label, word_rect)
-        # Tekrar başlat butonunu çiz
-        # draw_button("Tekrar Başla", WIDTH // 2 - 100, HEIGHT // 2 + 150, 200, 50, GRAY, BLACK)
 
+        # Şıkları çiz
+        buttons = []
+        for i, option in enumerate(options):
+            button_x = start_x + i * (button_width + button_spacing)
+            buttons.append(pygame.Rect(button_x, button_y, button_width, button_height))
+            draw_button(option, button_x, button_y, button_width, button_height, GRAY, BLACK)
+
+        # Oyunu sonlandırma koşulu
+        if hp <= 0:
+            # print("Oyun bitti!")
+
+            sounds[-2].set_volume(0.1)
+            sounds[-2].play()
+
+            screen.blit(background_image, (0, 0))
+            in_game_time = round((time.perf_counter() - start_time), 2)
+
+            word_label = large_font.render('OYUN BITTI', True, WHITE)
+            word_rect = word_label.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
+            screen.blit(word_label, word_rect)
+
+            word_label = large_font.render(f'SCOR: {score}', True, WHITE)
+            word_rect = word_label.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+            screen.blit(word_label, word_rect)
+
+            word_label = large_font.render(f'Süre: {in_game_time}', True, WHITE)
+            word_rect = word_label.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
+            screen.blit(word_label, word_rect)
+
+            word_label = large_font.render(f'by. F4ruk', True, WHITE)
+            word_rect = word_label.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 350))
+            screen.blit(word_label, word_rect)
+
+            # Tekrar başlat butonunu çiz
+            # draw_button("Tekrar Başla", WIDTH // 2 - 100, HEIGHT // 2 + 150, 200, 50, GRAY, BLACK)
+
+            pygame.display.flip()
+
+            time.sleep(4)
+            # print(f'süre {in_game_time=}')
+            running = False
+
+        # Ekranı güncelle
         pygame.display.flip()
-
-        time.sleep(4)
-        # print(f'süre {in_game_time=}')
-        running = False
-
-
-    # Ekranı güncelle
-    pygame.display.flip()
-
-# Pygame'den çık
-pygame.quit()
-sys.exit()
+except Exception as exception:
+    with open('log.log', 'a+', encoding='utf-8') as logf:
+        logf.write(str(exception))
+finally:
+    # Pygame'den çık
+    pygame.quit()
+    sys.exit()
