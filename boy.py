@@ -62,6 +62,7 @@ options = []
 correct_index = -1
 combo = 0
 is_shaking = False  # Sallanma sırasında tıklamaları engellemek için bayrak
+start_time = time.perf_counter()
 
 sounds = {
     1: pygame.mixer.Sound("assets/sounds/v1.mp3"),
@@ -150,7 +151,7 @@ while running:
                                 shake_screen(f'HELALLLLS!!!')  # Sallama efekti
                     else:
                         print("Yanlış!")
-                        hp -= 10
+                        hp -= 90
                         sounds[-1].play()  # v5.mp3 sesini çal
                         shake_screen(f'{options[correct_index]}')  # Sallama efekti
 
@@ -182,16 +183,30 @@ while running:
         buttons.append(pygame.Rect(button_x, button_y, button_width, button_height))
         draw_button(option, button_x, button_y, button_width, button_height, GRAY, BLACK)
 
-    # Ekranı güncelle
-    pygame.display.flip()
-
     # Oyunu sonlandırma koşulu
     if hp <= 0:
         print("Oyun bitti!")
+
         sounds[-2].set_volume(0.1)
         sounds[-2].play()
+
+        screen.blit(background_image, (0, 0))
+        in_game_time = round((time.perf_counter() - start_time), 2)
+        word_label = large_font.render('OYUN BITTI', True, WHITE)
+        word_rect = word_label.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
+        screen.blit(word_label, word_rect)
+        # Tekrar başlat butonunu çiz
+        # draw_button("Tekrar Başla", WIDTH // 2 - 100, HEIGHT // 2 + 150, 200, 50, GRAY, BLACK)
+
+        pygame.display.flip()
+
         time.sleep(4)
+        # print(f'süre {in_game_time=}')
         running = False
+
+
+    # Ekranı güncelle
+    pygame.display.flip()
 
 # Pygame'den çık
 pygame.quit()
